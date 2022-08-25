@@ -11,8 +11,10 @@ import java.util.stream.Collectors;
 
 public final class DockerfileReader {
 
-    private final String in = "C:\\tmp\\Dockerfile";
-    private final String out = "C:\\tmp\\Dockerfile-envs";
+    private final String in = Main.HOME + "Dockerfile";
+    private final String out = Main.HOME + "Dockerfile-envs";
+
+    private final OutputMode outputMode = Main.OUTPUT_MODE;
 
     public boolean start() throws Exception {
         final File inFile = new File(in);
@@ -24,8 +26,8 @@ public final class DockerfileReader {
             final String line = scanner.nextLine();
             if (line.startsWith("ENV ")) {
                 if (!line.contains("${")) {
-                    final String parts[] = line.split("\\s+", 3);
-                    envs.add(parts[1] + "=" + this.unquote(parts[2]));
+                    final String[] parts = line.split("\\s+", 3);
+                    envs.add(this.cleanName(parts[1]) + this.outputMode.nameValueSeparator + this.unquote(parts[2]));
                 }
             }
         }
@@ -34,9 +36,16 @@ public final class DockerfileReader {
 
         final boolean append = false;
         final BufferedWriter writer = new BufferedWriter(new FileWriter(outFile, append));
-        writer.write(envs.stream().collect(Collectors.joining(";")));
+        writer.write(envs.stream().collect(Collectors.joining(this.outputMode.lineSeparator)));
         writer.close();
         return true;
+    }
+
+    private String cleanName(final String name) {
+        if (name.endsWith(":")) {
+            return name.substring(0, name.length() - 1);
+        }
+        return name;
     }
 
     private String unquote(final String value) {
