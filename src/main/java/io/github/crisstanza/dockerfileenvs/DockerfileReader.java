@@ -1,5 +1,7 @@
 package io.github.crisstanza.dockerfileenvs;
 
+import io.github.crisstanza.dockerfileenvs.enums.OutputMode;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -11,8 +13,8 @@ import java.util.stream.Collectors;
 
 public final class DockerfileReader {
 
-    private final String in = Main.HOME + "Dockerfile";
-    private final String out = Main.HOME + "Dockerfile-envs";
+    private final String in = Main.DOCKERFILE_HOME + "Dockerfile";
+    private final String out = Main.DOCKERFILE_HOME + "Dockerfile-envs";
 
     private final OutputMode outputMode = Main.OUTPUT_MODE;
 
@@ -27,7 +29,7 @@ public final class DockerfileReader {
             if (line.startsWith("ENV ")) {
                 if (!line.contains("${")) {
                     final String[] parts = line.split("\\s+", 3);
-                    envs.add(this.cleanName(parts[1]) + this.outputMode.nameValueSeparator + this.unquote(parts[2]));
+                    envs.add(this.cleanName(parts[1]) + "=" + this.unquote(parts[2]));
                 }
             }
         }
