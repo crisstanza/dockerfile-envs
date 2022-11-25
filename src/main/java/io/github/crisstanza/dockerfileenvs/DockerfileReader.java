@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 public final class DockerfileReader {
 
+    public static final String REGEX_SPLIT_NAME_VALUE = "\\s+|=+";
     private final String in = Main.DOCKERFILE_HOME + "Dockerfile";
     private final String out = Main.DOCKERFILE_HOME + "Dockerfile-envs";
 
@@ -28,7 +29,7 @@ public final class DockerfileReader {
             final String line = scanner.nextLine();
             if (line.startsWith("ENV ")) {
                 if (!line.contains("${")) {
-                    final String[] parts = line.split("\\s+", 3);
+                    final String[] parts = line.split(REGEX_SPLIT_NAME_VALUE, 3);
                     envs.add(this.cleanName(parts[1]) + "=" + this.unquote(parts[2]));
                 }
             }
